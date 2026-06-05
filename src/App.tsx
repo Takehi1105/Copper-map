@@ -331,11 +331,11 @@ export default function App() {
             ["試料名", sampleName],
             ["日付", date],
             ["重量入力単位", weightUnit],
-            ["密度", density],
+            ["SUSの密度", density],
             ["密度単位", densityUnit],
-            ["厚み", thickness],
+            ["SUS板の厚み", thickness],
             ["厚み単位", thicknessUnit],
-            ["配置", layout === "row" ? "横方向" : "縦方向"],
+            ["並べ方", layout === "row" ? "横方向" : "縦方向"],
         ])
 
         const wsData = XLSX.utils.aoa_to_sheet([
@@ -425,7 +425,7 @@ export default function App() {
                     <option value="kg">kg</option>
                 </select>
 
-                密度：
+                SUSの密度：
                 <input
                     type="number"
                     value={density}
@@ -442,7 +442,7 @@ export default function App() {
                     <option value="kg/m3">kg/m³</option>
                 </select>
 
-                厚み：
+                SUS板の厚み：
                 <input
                     type="number"
                     value={thickness}
@@ -461,7 +461,7 @@ export default function App() {
             </div>
 
             <div style={{ marginBottom: 8 }}>
-                配置：
+                並べ方：
                 <select
                     value={layout}
                     onChange={e => setLayout(e.target.value as "row" | "col")}
