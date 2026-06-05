@@ -48,6 +48,25 @@ export default function App() {
     const [thicknessUnit, setThicknessUnit] = useState<"mm" | "cm" | "m">("mm")
 
     const [layout, setLayout] = useState<"row" | "col">("row")
+    // --------------------
+    // ページ切替
+    // --------------------
+    const [page, setPage] = useState<"main" | "electro">("main")
+
+    // --------------------
+    // 電解効率計算用
+    // --------------------
+    const [electroTimeValue, setElectroTimeValue] = useState(10)
+    const [electroTimeUnit, setElectroTimeUnit] = useState<"s" | "m" | "h">("m")
+
+    const [electroCurrentA, setElectroCurrentA] = useState(1)
+    const [massBeforeG, setMassBeforeG] = useState(0)
+    const [massAfterG, setMassAfterG] = useState(0)
+
+
+    const [theoreticalDepositG, setTheoreticalDepositG] = useState<number | undefined>(undefined)
+    const [actualDepositG, setActualDepositG] = useState<number | undefined>(undefined)
+    const [electroEfficiency, setElectroEfficiency] = useState<number | undefined>(undefined)
 
     // --------------------
     // 単位変換
@@ -70,6 +89,12 @@ export default function App() {
         if (thicknessUnit === "cm") return thickness * 10
         if (thicknessUnit === "m") return thickness * 1000
         return thickness
+    }
+    function electroTimeToSec() {
+        if (electroTimeUnit === "s") return electroTimeValue
+        if (electroTimeUnit === "m") return electroTimeValue * 60
+        if (electroTimeUnit === "h") return electroTimeValue * 3600
+        return electroTimeValue
     }
 
     // --------------------
@@ -157,6 +182,58 @@ export default function App() {
         }
 
         setData(next)
+    }
+    // --------------------
+    // 電解効率計算
+    // --------------------
+    // --------------------
+    // 電解効率計算
+    // --------------------
+    function calculateElectroEfficiency() {
+        const M_CU = 63.546 // 銅のモル質量 [g/mol]
+        const ELECTRON_NUM = 2 // Cu2+ + 2e- → Cu
+        const FARADAY = 96485 // ファラデー定数 [C/mol]
+
+        const timeSec = electroTimeToSec()
+
+        const errors: string[] = []
+
+        if (!isFinite(electroTimeValue) || electroTimeValue <= 0) {
+            errors.push("電解時間が不正です")
+        }
+
+        if (!isFinite(timeSec) || timeSec <= 0) {
+            errors.push("秒換算後の電解時間が不正です")
+        }
+
+        if (!isFinite(electroCurrentA) || electroCurrentA <= 0) {
+            errors.push("電流が不正です")
+        }
+
+        if (!isFinite(massBeforeG)) {
+            errors.push("実験前の質量が不正です")
+        }
+
+        if (!isFinite(massAfterG)) {
+            errors.push("実験後の質量が不正です")
+        }
+
+        if (massAfterG < massBeforeG) {
+            errors.push("実験後の質量が実験前の質量より小さいです")
+        }
+
+        if (errors.length > 0) {
+            alert(errors.join("\n"))
+            return
+        }
+
+        const theoretical = (M_CU * electroCurrentA * timeSec) / (ELECTRON_NUM * FARADAY)
+        const actual = massAfterG - massBeforeG
+        const efficiency = theoretical === 0 ? 0 : (actual / theoretical) * 100
+
+        setTheoreticalDepositG(theoretical)
+        setActualDepositG(actual)
+        setElectroEfficiency(efficiency)
     }
 
     // --------------------
@@ -394,9 +471,51 @@ export default function App() {
         XLSX.writeFile(wb, `${safeDate}_${safeSample}.xlsx`)
     }
 
-    return (
+return (
         <div style={{ padding: 20, fontFamily: "Meiryo, sans-serif" }}>
-            <h2>条件入力</h2>
+            <div style={{ marginBottom: 24, display: "flex", gap: 12 }}>
+                <button
+                onClick={() => setPage("main")}
+                style={{
+                    padding: "10px 18px",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    borderRadius: 8,
+                    border: page === "main" ? "2px solid #005bac" : "1px solid #999",
+                    background: page === "main" ? "#005bac" : "#f5f5f5",
+                    color: page === "main" ? "white" : "black",
+                    cursor: "pointer",
+                }}
+            >
+                銅重量ヒートマップ
+            </button>
+
+            <button
+                onClick={() => setPage("electro")}
+                style={{
+                    padding: "10px 18px",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    borderRadius: 8,
+                    border: page === "electro" ? "2px solid #005bac" : "1px solid #999",
+                    background: page === "electro" ? "#005bac" : "#f5f5f5",
+                    color: page === "electro" ? "white" : "black",
+                    cursor: "pointer",
+                }}
+            >
+                電解効率計算
+            </button>
+        </div>
+
+        {page === "main" && (
+            <div
+                style={{
+                    textAlign: "center",
+                    maxWidth: 1000,
+                    margin: "0 auto",
+                }}
+            >
+                <h2>条件入力</h2>
 
             <div style={{ marginBottom: 8 }}>
                 試料名：
@@ -486,7 +605,13 @@ export default function App() {
 
             <h2>数値入力</h2>
 
-            <table border={1} style={{ borderCollapse: "collapse", marginBottom: 20 }}>
+                <table
+                    border={1}
+                    style={{
+                        borderCollapse: "collapse",
+                        margin: "0 auto 20px auto",
+                    }}
+                >
                 <thead>
                     <tr>
                         <th style={{ padding: 4 }}>No</th>
@@ -534,14 +659,26 @@ export default function App() {
                 </tbody>
             </table>
 
-            <h2>ヒートマップ</h2>
+                <h2>ヒートマップ</h2>
 
-            <div>
-                {mapList.map((m, idx) => {
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                    }}
+                >
+                    {mapList.map((m, idx) => {
                     const g = makeGrid(m.values)
 
                     return (
-                        <div key={idx} style={{ marginBottom: 24 }}>
+                        <div
+                            key={idx}
+                            style={{
+                                marginBottom: 24,
+                                textAlign: "center",
+                            }}
+                        >
                             <h3 style={{ marginBottom: 6 }}>
                                 {m.title} [{m.unit}]
                             </h3>
@@ -599,7 +736,287 @@ export default function App() {
                         </div>
                     )
                 })}
+                    </div>
+                </div>
+            )}
+
+        {page === "electro" && (
+            <div
+                style={{
+                    textAlign: "center",
+                    maxWidth: 900,
+                    margin: "0 auto",
+                }}
+            >
+                <h2>電解効率計算</h2>
+
+                <div style={{ marginBottom: 12 }}>
+                    電解時間：
+                    <input
+                        type="number"
+                        value={electroTimeValue}
+                        onChange={e => setElectroTimeValue(parseFloat(e.target.value))}
+                        style={{ width: 100, marginLeft: 8, marginRight: 4 }}
+                    />
+
+                    <select
+                        value={electroTimeUnit}
+                        onChange={e => setElectroTimeUnit(e.target.value as "s" | "m" | "h")}
+                        style={{ marginRight: 12 }}
+                    >
+                        <option value="s">s</option>
+                        <option value="m">m</option>
+                        <option value="h">h</option>
+                    </select>
+
+                    <span>
+                        内部計算時間：
+                        {isFinite(electroTimeToSec()) ? electroTimeToSec().toFixed(3) : "-"} s
+                    </span>
+                </div>
+
+                <div style={{ marginBottom: 12 }}>
+                    電流：
+                    <input
+                        type="number"
+                        value={electroCurrentA}
+                        onChange={e => setElectroCurrentA(parseFloat(e.target.value))}
+                        style={{ width: 100, marginLeft: 8, marginRight: 4 }}
+                    />
+                    A
+                </div>
+
+                <div style={{ marginBottom: 12 }}>
+                    実験前の質量：
+                    <input
+                        type="number"
+                        value={massBeforeG}
+                        onChange={e => setMassBeforeG(parseFloat(e.target.value))}
+                        style={{ width: 120, marginLeft: 8, marginRight: 4 }}
+                    />
+                    g
+                </div>
+
+                <div style={{ marginBottom: 12 }}>
+                    実験後の質量：
+                    <input
+                        type="number"
+                        value={massAfterG}
+                        onChange={e => setMassAfterG(parseFloat(e.target.value))}
+                        style={{ width: 120, marginLeft: 8, marginRight: 4 }}
+                    />
+                    g
+                </div>
+
+                <button
+                    onClick={calculateElectroEfficiency}
+                    style={{
+                        padding: "8px 16px",
+                        fontSize: 15,
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                    }}
+                >
+                    電解効率を計算
+                </button>
+
+                <h2 style={{ marginTop: 24 }}>計算結果</h2>
+
+                <table
+                    border={1}
+                    style={{
+                        borderCollapse: "collapse",
+                        margin: "0 auto 20px auto",
+                        textAlign: "center",
+}}>
+                    <tbody>
+                        <tr>
+                            <th style={{ padding: 6 }}>理論析出量</th>
+                            <td style={{ padding: 6 }}>
+                                {theoreticalDepositG !== undefined
+                                    ? `${theoreticalDepositG.toFixed(6)} g`
+                                    : "-"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th style={{ padding: 6 }}>実際析出量</th>
+                            <td style={{ padding: 6 }}>
+                                {actualDepositG !== undefined
+                                    ? `${actualDepositG.toFixed(6)} g`
+                                    : "-"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th style={{ padding: 6 }}>電解効率</th>
+                            <td style={{ padding: 6 }}>
+                                {electroEfficiency !== undefined
+                                    ? `${electroEfficiency.toFixed(4)} %`
+                                    : "-"}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 style={{ marginTop: 24 }}>途中計算</h2>
+
+                <table
+                    border={1}
+                    style={{
+                        borderCollapse: "collapse",
+                        margin: "0 auto 20px auto",
+                        textAlign: "center",
+                    }}
+                >
+                    <tbody>
+                        <tr>
+                            <th style={{ padding: 6 }}>時間換算</th>
+                            <td style={{ padding: 6 }}>
+                                {electroTimeValue} {electroTimeUnit}
+                                {" = "}
+                                {isFinite(electroTimeToSec()) ? electroTimeToSec().toFixed(3) : "-"} s
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th style={{ padding: 6 }}>理論析出量</th>
+                            <td style={{ padding: 6 }}>
+                                m<sub>th</sub> = 63.546 × {electroCurrentA} ×{" "}
+                                {isFinite(electroTimeToSec()) ? electroTimeToSec().toFixed(3) : "-"}
+                                {" ÷ 2 ÷ 96485 = "}
+                                {theoreticalDepositG !== undefined
+                                    ? `${theoreticalDepositG.toFixed(6)} g`
+                                    : "-"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th style={{ padding: 6 }}>実際析出量</th>
+                            <td style={{ padding: 6 }}>
+                                m<sub>actual</sub> = {massAfterG} − {massBeforeG}
+                                {" = "}
+                                {actualDepositG !== undefined
+                                    ? `${actualDepositG.toFixed(6)} g`
+                                    : "-"}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th style={{ padding: 6 }}>電解効率</th>
+                            <td style={{ padding: 6 }}>
+                                η ={" "}
+                                {actualDepositG !== undefined ? actualDepositG.toFixed(6) : "-"}
+                                {" ÷ "}
+                                {theoreticalDepositG !== undefined ? theoreticalDepositG.toFixed(6) : "-"}
+                                {" × 100 = "}
+                                {electroEfficiency !== undefined
+                                    ? `${electroEfficiency.toFixed(4)} %`
+                                    : "-"}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 style={{ marginTop: 24 }}>使用式</h2>
+
+                <div
+                    style={{
+                        border: "1px solid #999",
+                        padding: 16,
+                        width: "fit-content",
+                        margin: "0 auto",
+                        background: "#f9f9f9",
+                        lineHeight: 2,
+                        fontSize: 17,
+                        textAlign: "center",
+                    }}
+                >
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            理論析出量
+                        </div>
+
+                        <div>
+                            m<sub>th</sub> =
+                            <span
+                                style={{
+                                    display: "inline-block",
+                                    textAlign: "center",
+                                    marginLeft: 8,
+                                    verticalAlign: "middle",
+                                }}
+                            >
+                                <span
+                                    style={{
+                                        display: "block",
+                                        borderBottom: "1px solid black",
+                                        padding: "0 12px",
+                                    }}
+                                >
+                                    M I t
+                                </span>
+                                <span style={{ display: "block", padding: "0 12px" }}>
+                                    n F
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            実際析出量
+                        </div>
+
+                        <div>
+                            m<sub>actual</sub> = m<sub>after</sub> − m<sub>before</sub>
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            電解効率
+                        </div>
+
+                        <div>
+                            η =
+                            <span
+                                style={{
+                                    display: "inline-block",
+                                    textAlign: "center",
+                                    marginLeft: 8,
+                                    verticalAlign: "middle",
+                                }}
+                            >
+                                <span
+                                    style={{
+                                        display: "block",
+                                        borderBottom: "1px solid black",
+                                        padding: "0 12px",
+                                    }}
+                                >
+                                    m<sub>actual</sub>
+                                </span>
+                                <span style={{ display: "block", padding: "0 12px" }}>
+                                    m<sub>th</sub>
+                                </span>
+                            </span>
+                            × 100
+                        </div>
+                    </div>
+
+                    <div
+                        style={{
+                            fontSize: 14,
+                            borderTop: "1px solid #ccc",
+                            paddingTop: 8,
+                        }}
+                    >
+                        M = 63.546 g/mol, n = 2, F = 96485 C/mol, t = 秒換算後の電解時間
+                    </div>
+                </div>
             </div>
+        )}
         </div>
     )
 }
