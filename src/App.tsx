@@ -664,14 +664,16 @@ return (
                                 const key = ["w1", "w2", "w3"][col] as keyof Row
 
                                 return (
-                                    <td key={col} style={{ padding: 4 }}>
+                                    <td
+                                        key={col}
+                                        style={{
+                                            padding: 4,
+                                            overflow: "hidden",
+                                        }}
+                                    >
                                         <input
                                             type="number"
-                                            value={
-                                                col === 0 ? r.w1 ?? "" :
-                                                    col === 1 ? r.w2 ?? "" :
-                                                        r.w3 ?? ""
-                                            }
+                                            value={r[key] ?? ""}
                                             ref={el => {
                                                 if (!inputRefs.current[i]) inputRefs.current[i] = []
                                                 if (el) inputRefs.current[i][col] = el
@@ -683,7 +685,11 @@ return (
                                                     inputRefs.current[i + 1]?.[col]?.focus()
                                                 }
                                             }}
-                                            style={{ width: "100%", minWidth: 80 }}
+                                            style={{
+                                                width: "100%",
+                                                minWidth: 0,
+                                                boxSizing: "border-box",
+                                            }}
                                         />
                                     </td>
                                 )
@@ -699,7 +705,7 @@ return (
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
                         gap: 16,
                         justifyItems: "center",
                     }}
@@ -709,10 +715,10 @@ return (
 
                     return (
                         <div
-                            key={idx}
                             style={{
                                 marginBottom: 24,
                                 textAlign: "center",
+                                width: "100%",
                             }}
                         >
                             <h3 style={{ marginBottom: 6 }}>
