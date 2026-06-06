@@ -472,8 +472,22 @@ export default function App() {
     }
 
 return (
-        <div style={{ padding: 20, fontFamily: "Meiryo, sans-serif" }}>
-            <div style={{ marginBottom: 24, display: "flex", gap: 12 }}>
+    <div
+        style={{
+            padding: 10,
+            fontFamily: "Meiryo, sans-serif",
+            boxSizing: "border-box",
+        }}
+    >
+        <div
+            style={{
+                marginBottom: 24,
+                display: "flex",
+                gap: 12,
+                flexWrap: "wrap",
+                justifyContent: "center",
+            }}
+        >
                 <button
                 onClick={() => setPage("main")}
                 style={{
@@ -511,18 +525,28 @@ return (
             <div
                 style={{
                     textAlign: "center",
-                    maxWidth: 1000,
+                    maxWidth: "100%",
                     margin: "0 auto",
+                    padding: "0 8px",
                 }}
             >
+
                 <h2>条件入力</h2>
 
-            <div style={{ marginBottom: 8 }}>
+                <div
+                    style={{
+                        marginBottom: 8,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        justifyContent: "center",
+                    }}
+                >
                 試料名：
                 <input
                     value={sampleName}
                     onChange={e => setSampleName(e.target.value)}
-                    style={{ marginRight: 12 }}
+                        style={{ width: "100%", maxWidth: 200 }}
                 />
 
                 日付：
@@ -533,7 +557,15 @@ return (
                 />
             </div>
 
-            <div style={{ marginBottom: 8 }}>
+                <div
+                    style={{
+                        marginBottom: 8,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        justifyContent: "center",
+                    }}
+                >
                 重量入力単位：
                 <select
                     value={weightUnit}
@@ -549,7 +581,7 @@ return (
                     type="number"
                     value={density}
                     onChange={e => setDensity(parseFloat(e.target.value))}
-                    style={{ width: 90 }}
+                    style={{ width: "100%", maxWidth: 120 }}
                 />
                 <select
                     value={densityUnit}
@@ -566,7 +598,7 @@ return (
                     type="number"
                     value={thickness}
                     onChange={e => setThickness(parseFloat(e.target.value))}
-                    style={{ width: 90 }}
+                    style={{ width: "100%", maxWidth: 120 }}
                 />
                 <select
                     value={thicknessUnit}
@@ -605,13 +637,15 @@ return (
 
             <h2>数値入力</h2>
 
-                <table
-                    border={1}
-                    style={{
-                        borderCollapse: "collapse",
-                        margin: "0 auto 20px auto",
-                    }}
-                >
+                <div style={{ overflowX: "auto" }}>
+                    <table
+                        border={1}
+                        style={{
+                            borderCollapse: "collapse",
+                            margin: "0 auto 20px auto",
+                            minWidth: 600,
+                        }}
+                    >
                 <thead>
                     <tr>
                         <th style={{ padding: 4 }}>No</th>
@@ -649,7 +683,7 @@ return (
                                                     inputRefs.current[i + 1]?.[col]?.focus()
                                                 }
                                             }}
-                                            style={{ width: 120 }}
+                                            style={{ width: "100%", minWidth: 80 }}
                                         />
                                     </td>
                                 )
@@ -658,14 +692,16 @@ return (
                     ))}
                 </tbody>
             </table>
+            </div>
 
                 <h2>ヒートマップ</h2>
 
                 <div
                     style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                        gap: 16,
+                        justifyItems: "center",
                     }}
                 >
                     {mapList.map((m, idx) => {
@@ -687,10 +723,12 @@ return (
                                 id={`map-${idx}`}
                                 style={{
                                     display: "inline-grid",
-                                    gridTemplateColumns: "repeat(5, 50px)",
-                                    gridTemplateRows: "repeat(5, 50px)",
-                                    width: 250,
-                                    height: 250,
+                                    gridTemplateColumns: "repeat(5, 1fr)",
+                                    gridTemplateRows: "repeat(5, 1fr)",
+                                    width: "90vw",
+                                    height: "90vw",
+                                    maxWidth: 250,
+                                    maxHeight: 250,
                                     overflow: "hidden",
                                     background: "transparent",
                                     lineHeight: 1,
@@ -700,8 +738,8 @@ return (
                                     <div
                                         key={cellIndex}
                                         style={{
-                                            width: 50,
-                                            height: 50,
+                                            width: "100%",
+                                            height: "100%",
                                             boxSizing: "border-box",
                                             border: "1px solid black",
                                             background: getColor(v, m.values, m.susColor),
@@ -750,7 +788,15 @@ return (
             >
                 <h2>電解効率計算</h2>
 
-                <div style={{ marginBottom: 12 }}>
+                <div
+                    style={{
+                        marginBottom: 12,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        justifyContent: "center",
+                    }}
+                >
                     電解時間：
                     <input
                         type="number"
@@ -775,7 +821,15 @@ return (
                     </span>
                 </div>
 
-                <div style={{ marginBottom: 12 }}>
+                <div
+                    style={{
+                        marginBottom: 12,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        justifyContent: "center",
+                    }}
+                >
                     電流：
                     <input
                         type="number"
