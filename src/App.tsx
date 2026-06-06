@@ -535,99 +535,131 @@ return (
 
                 <div
                     style={{
-                        marginBottom: 8,
+                        marginBottom: 12,
                         display: "flex",
-                        flexWrap: "wrap",
-                        gap: 8,
-                        justifyContent: "center",
+                        flexDirection: "column",
+                        gap: 12,
+                        alignItems: "center",
                     }}
                 >
-                試料名：
-                <input
-                    value={sampleName}
-                    onChange={e => setSampleName(e.target.value)}
-                        style={{ width: "100%", maxWidth: 200 }}
-                />
+                    {/* 試料名 */}
+                    <div style={{ width: "100%", maxWidth: 320 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            試料名
+                        </div>
+                        <input
+                            value={sampleName}
+                            onChange={e => setSampleName(e.target.value)}
+                            style={{ width: "100%", boxSizing: "border-box" }}
+                        />
+                    </div>
 
-                日付：
-                <input
-                    type="date"
-                    value={date}
-                    onChange={e => setDate(e.target.value)}
-                />
-            </div>
+                    {/* 日付 */}
+                    <div style={{ width: "100%", maxWidth: 320 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            日付
+                        </div>
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={e => setDate(e.target.value)}
+                            style={{ width: "100%", boxSizing: "border-box" }}
+                        />
+                    </div>
 
-                <div
-                    style={{
-                        marginBottom: 8,
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 8,
-                        justifyContent: "center",
-                    }}
-                >
-                重量入力単位：
-                <select
-                    value={weightUnit}
-                    onChange={e => setWeightUnit(e.target.value as "g" | "kg")}
-                    style={{ marginRight: 12 }}
-                >
-                    <option value="g">g</option>
-                    <option value="kg">kg</option>
-                </select>
+                    {/* 重量単位 */}
+                    <div style={{ width: "100%", maxWidth: 320 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            重量入力単位
+                        </div>
+                        <select
+                            value={weightUnit}
+                            onChange={e => setWeightUnit(e.target.value as "g" | "kg")}
+                            style={{ width: "100%" }}
+                        >
+                            <option value="g">g</option>
+                            <option value="kg">kg</option>
+                        </select>
+                    </div>
 
-                SUSの密度：
-                <input
-                    type="number"
-                    value={density}
-                    onChange={e => setDensity(parseFloat(e.target.value))}
-                    style={{ width: "100%", maxWidth: 120 }}
-                />
-                <select
-                    value={densityUnit}
-                    onChange={e => setDensityUnit(e.target.value as "g/cm3" | "g/mm3" | "kg/m3")}
-                    style={{ marginRight: 12 }}
-                >
-                    <option value="g/cm3">g/cm³</option>
-                    <option value="g/mm3">g/mm³</option>
-                    <option value="kg/m3">kg/m³</option>
-                </select>
+                    {/* 密度 */}
+                    <div style={{ width: "100%", maxWidth: 320 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            SUSの密度
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                            <input
+                                type="number"
+                                value={density}
+                                onChange={e => setDensity(parseFloat(e.target.value))}
+                                style={{ flex: 1 }}
+                            />
+                            <select
+                                value={densityUnit}
+                                onChange={e =>
+                                    setDensityUnit(e.target.value as "g/cm3" | "g/mm3" | "kg/m3")
+                                }
+                            >
+                                <option value="g/cm3">g/cm³</option>
+                                <option value="g/mm3">g/mm³</option>
+                                <option value="kg/m3">kg/m³</option>
+                            </select>
+                        </div>
+                    </div>
 
-                SUS板の厚み：
-                <input
-                    type="number"
-                    value={thickness}
-                    onChange={e => setThickness(parseFloat(e.target.value))}
-                    style={{ width: "100%", maxWidth: 120 }}
-                />
-                <select
-                    value={thicknessUnit}
-                    onChange={e => setThicknessUnit(e.target.value as "mm" | "cm" | "m")}
-                    style={{ marginRight: 12 }}
-                >
-                    <option value="mm">mm</option>
-                    <option value="cm">cm</option>
-                    <option value="m">m</option>
-                </select>
-            </div>
+                    {/* 厚み */}
+                    <div style={{ width: "100%", maxWidth: 320 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            SUS板の厚み
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                            <input
+                                type="number"
+                                value={thickness}
+                                onChange={e => setThickness(parseFloat(e.target.value))}
+                                style={{ flex: 1 }}
+                            />
+                            <select
+                                value={thicknessUnit}
+                                onChange={e =>
+                                    setThicknessUnit(e.target.value as "mm" | "cm" | "m")
+                                }
+                            >
+                                <option value="mm">mm</option>
+                                <option value="cm">cm</option>
+                                <option value="m">m</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <div style={{ marginBottom: 8 }}>
-                並べ方：
-                <select
-                    value={layout}
-                    onChange={e => setLayout(e.target.value as "row" | "col")}
-                    style={{ marginRight: 12 }}
-                >
-                    <option value="row">横方向</option>
-                    <option value="col">縦方向</option>
-                </select>
+                    {/* 並べ方 */}
+                    <div style={{ width: "100%", maxWidth: 320 }}>
+                        <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                            並べ方
+                        </div>
+                        <select
+                            value={layout}
+                            onChange={e => setLayout(e.target.value as "row" | "col")}
+                            style={{ width: "100%" }}
+                        >
+                            <option value="row">横方向</option>
+                            <option value="col">縦方向</option>
+                        </select>
 
-                <span style={{ display: "inline-block", whiteSpace: "pre", fontFamily: "monospace" }}>
-                    {layout === "row"
-                        ? "横方向: 1 2 3 4 5 / 6 7 8 9 10"
-                        : "縦方向: 1 6 11 16 21 / 2 7 12 17 22"}
-                </span>
-            </div>
+                        <div
+                            style={{
+                                marginTop: 6,
+                                fontFamily: "monospace",
+                                fontSize: 12,
+                                whiteSpace: "normal",
+                            }}
+                        >
+                            {layout === "row"
+                                ? "横方向: 1 2 3 4 5 / 6 7 8 9 10"
+                                : "縦方向: 1 6 11 16 21 / 2 7 12 17 22"}
+                        </div>
+                    </div>
+                </div>
 
             <div style={{ marginBottom: 12 }}>
                 <button onClick={sampleFill}>サンプル入力</button>
